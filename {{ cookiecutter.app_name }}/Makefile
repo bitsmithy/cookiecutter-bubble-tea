@@ -48,9 +48,5 @@ test: dependencies
 ## audit: tidy dependencies and format, and vet all code
 .PHONY: audit
 audit: dependencies
-	@echo 'Formatting code...'
-	go fmt ./...
-	@echo 'Vetting code...'
-	go vet ./...
-	staticcheck ./...
+	@echo 'Auditing code...'
 	golangci-lint run
