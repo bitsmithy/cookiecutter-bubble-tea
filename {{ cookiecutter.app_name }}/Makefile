@@ -12,7 +12,6 @@ confirm:
 .PHONY: install
 install:
 	asdf install
-	go install honnef.co/go/tools/cmd/staticcheck@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install gotest.tools/gotestsum@latest
 
