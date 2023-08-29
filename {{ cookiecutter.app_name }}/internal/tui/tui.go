@@ -66,5 +66,6 @@ func (m model) View() string {
 }
 
 func Start() error {
-  return tea.NewProgram(initialModel(), tea.WithAltScreen()).Start()
+	_, err := tea.NewProgram(initialModel(), tea.WithAltScreen()).Run()
+	return err
 }
