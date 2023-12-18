@@ -2,11 +2,9 @@
   "app_path": "github.com/myorg/myapp",
   "app_name": "{{ cookiecutter.app_path.split('/')[-1] }}",
   "golang_version": "1.21.0",
-  "version": "0.1.0",
   "__prompts__": {
     "app_path": "App Path:",
     "app_name": "App Name:",
-    "golang_version": "Go Version:",
-    "version": "Project Version:"
+    "golang_version": "Go Version:"
   }
 }

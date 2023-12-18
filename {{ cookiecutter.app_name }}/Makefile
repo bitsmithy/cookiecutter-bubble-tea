@@ -1,3 +1,10 @@
+VERSION ?= $(shell ./scripts/semver current)
+BUILD_COMMIT ?= $(shell git rev-parse HEAD)
+BUILD_BY ?= $(shell git config user.name)
+BUILD_TIME ?= $(shell date --utc)
+BUILD_SYMBOL_PREFIX ?= $(shell cat go.mod | grep -e "^module" | cut -d" " -f2)/internal/build
+BUILD_LDFLAGS=-ldflags "-X '$(BUILD_SYMBOL_PREFIX).Version=$(VERSION)' -X '$(BUILD_SYMBOL_PREFIX).Commit=$(BUILD_COMMIT)' -X '$(BUILD_SYMBOL_PREFIX).User=$(BUILD_BY)' -X '$(BUILD_SYMBOL_PREFIX).Time=$(BUILD_TIME)'"
+
 ## help: print this help message
 .PHONY: help
 help:
@@ -6,12 +13,19 @@ help:
 
 .PHONY: confirm
 confirm:
-	@echo -n 'Are you sure? [y/N] ' && read ans && [ $${ans:-N} = y ]
+	@echo 'Are you sure? [y/N] \c' && read ans && [ $${ans:-N} = y ]
+
+.PHONY: check_dirty_workspace
+check_dirty_workspace:
+	@git diff --quiet
+
+.PHONY: check_all
+check_all: check_dirty_workspace audit test confirm
 
 ## install: bootstrap all dependencies for the project
 .PHONY: install
 install:
-	@asdf --version >/dev/null 2>&1 || (echo "ERROR: asdf (https://asdf-vm.com) is required. Install and try again."; exit 1)
+	$(if $(shell command -v asdf 2> /dev/null),,$(error ERROR: `asdf` [https://asdf-vm.com] is required))
 	asdf install
 	go get -u && go mod tidy
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
@@ -22,10 +36,15 @@ install:
 run:
 	go run .
 
-## build: build the app
+## build: build the app with passed in `VERSION`, defaulting to current version
 .PHONY: build
-build:
-	go build -o bin/{{ cookiecutter.app_name }} .
+build: check_all
+	go generate ./...
+	@echo "Building version ${VERSION}"
+	git fetch --all --tags --prune
+	git checkout tags/$(VERSION)
+	go build $(BUILD_LDFLAGS) -o bin/ ./...
+	git checkout -
 
 ## clean: cleanup build files
 .PHONY: clean
@@ -51,3 +70,25 @@ test: dependencies
 audit: dependencies
 	@echo 'Auditing code...'
 	golangci-lint run
+
+## tag-patch: create and push a git tag indicating the next patch version
+.PHONY: tag-patch
+tag-patch: check_all
+	scripts/semver -w next-patch
+
+## tag-minor: create and push a git tag indicating the next minor version
+.PHONY: tag-minor
+tag-minor: check_all
+	scripts/semver -w next-minor
+
+## tag-major: create and push a git tag indicating the next major version
+.PHONY: tag-major
+tag-major: check_all
+	scripts/semver -w next-major
+
+## release: create a release, using VERSION, defaulting to the current version
+.PHONY: release
+release: check_all
+	@echo "Releasing version ${VERSION}"
+	git publish
+	git push --tags

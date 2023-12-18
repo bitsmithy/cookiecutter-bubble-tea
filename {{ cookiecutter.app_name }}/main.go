@@ -5,16 +5,13 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/charmbracelet/log"
 
+	"{{ cookiecutter.app_path }}/internal/build"
 	"{{ cookiecutter.app_path }}/internal/tui"
-)
-
-const (
-	version = "{{ cookiecutter.version }}"
-	appName = "{{ cookiecutter.app_name }}"
 )
 
 func main() {
@@ -27,11 +24,11 @@ func main() {
 	slog.SetDefault(logger)
 
 	if len(os.Args[1:]) >= 1 {
-		printVersion := flag.Bool("v", false, fmt.Sprintf("prints version number of %s", appName))
+		printVersion := flag.Bool("v", false, fmt.Sprintf("prints version info for %s", filepath.Base(os.Args[0])))
 		flag.Parse()
 
 		if *printVersion {
-			fmt.Println(version)
+			build.PrintInfo()
 			os.Exit(0)
 		}
 	} else {
