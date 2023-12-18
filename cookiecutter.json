@@ -1,8 +1,8 @@
 {
-  "app_path": "github.com/myorg/myapp",
+  "app_path": null,
   "app_name": "{{ cookiecutter.app_path.split('/')[-1] }}",
   "__prompts__": {
-    "app_path": "App Path:",
-    "app_name": "App Name:"
+    "app_path": "App Path (e.g. github.com/myorg/myapp)",
+    "app_name": "App Name"
   }
 }
