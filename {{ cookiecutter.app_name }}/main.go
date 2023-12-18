@@ -2,10 +2,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log/slog"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/charmbracelet/log"
@@ -24,7 +22,7 @@ func main() {
 	slog.SetDefault(logger)
 
 	if len(os.Args[1:]) >= 1 {
-		printVersion := flag.Bool("v", false, fmt.Sprintf("prints version info for %s", filepath.Base(os.Args[0])))
+		printVersion := flag.Bool("v", false, "prints version info")
 		flag.Parse()
 
 		if *printVersion {
