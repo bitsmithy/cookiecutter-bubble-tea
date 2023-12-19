@@ -29,7 +29,9 @@ install:
 	asdf install
 	go get -u && go mod tidy
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	go install github.com/incu6us/goimports-reviser/v3@latest
 	go install gotest.tools/gotestsum@latest
+	go install mvdan.cc/gofumpt@latest
 
 ## run: run the app
 .PHONY: run
@@ -69,6 +71,7 @@ test: dependencies
 .PHONY: audit
 audit: dependencies
 	@echo 'Auditing code...'
+	goimports-reviser -rm-unused -set-alias -format ./...
 	golangci-lint run
 
 ## tag-patch: create and push a git tag indicating the next patch version
