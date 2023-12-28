@@ -20,14 +20,15 @@ check_dirty_workspace:
 	@git diff --quiet
 
 .PHONY: check_all
-check_all: check_dirty_workspace audit test confirm
+check_all: check_dirty_workspace audit confirm
 
-## install: bootstrap all dependencies for the project
-.PHONY: install
-install:
+## setup: bootstrap the project for development
+.PHONY: setup
+setup:
 	$(if $(shell command -v asdf 2> /dev/null),,$(error ERROR: `asdf` [https://asdf-vm.com] is required))
 	asdf install
 	go get -u && go mod tidy
+	go install github.com/evilmartians/lefthook@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install github.com/incu6us/goimports-reviser/v3@latest
 	go install gotest.tools/gotestsum@latest
@@ -65,14 +66,25 @@ dependencies:
 test: dependencies
 	@echo 'Running tests...'
 	go clean -testcache
-	gotestsum --format dots-v2 -- -race -vet=off ./...
+	gotestsum
 
-## audit: tidy dependencies and format, and vet all code
-.PHONY: audit
-audit: dependencies
-	@echo 'Auditing code...'
+## lint: run all linters
+.PHONY: lint
+lint:
+	@echo 'Linting code...'
+	golangci-lint run --fix
+
+## format: autoformat all code
+.PHONY: format
+format:
+	@echo 'Formatting code...'
 	goimports-reviser -rm-unused -set-alias -format ./...
-	golangci-lint run
+	gofumpt -l -w .
+
+## audit: tidy dependencies, lint, and format all code
+.PHONY: audit
+audit: dependencies format lint test
+	@echo 'Done.'
 
 ## tag-patch: create and push a git tag indicating the next patch version
 .PHONY: tag-patch
