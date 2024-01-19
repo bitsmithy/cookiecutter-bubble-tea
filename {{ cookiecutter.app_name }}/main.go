@@ -2,14 +2,15 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log/slog"
 	"os"
 	"time"
 
 	"github.com/charmbracelet/log"
 
-	"{{ cookiecutter.app_path }}/internal/build"
 	"{{ cookiecutter.app_path }}/internal/tui"
+	"{{ cookiecutter.app_path }}/internal/version"
 )
 
 func main() {
@@ -26,7 +27,7 @@ func main() {
 		flag.Parse()
 
 		if *printVersion {
-			build.PrintInfo()
+			fmt.Printf("version: %s\n", version.Get())
 			os.Exit(0)
 		}
 	} else {
