@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-asdf install golang latest
-asdf local golang latest
+mise use golang@latest
 go mod init '{{ cookiecutter.app_path }}'
 make setup
 make format
