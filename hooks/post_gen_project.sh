@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+mise install golang@latest
 mise use golang@latest
 go mod init '{{ cookiecutter.app_path }}'
 make bootstrap
